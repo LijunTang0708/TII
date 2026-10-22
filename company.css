@@ -8,8 +8,11 @@
 .company-nav span{font-size:15px;color:var(--dark)}
 /* Keep anchored sections clear of the sticky section bar. */
 #about,#vision,#culture{scroll-margin-top:68px}
+/* No caption card under the photo any more, so drop the space reserved for it. */
+#about .about-visual{padding-bottom:0;margin-right:0}
 .company-vision{position:relative;min-height:560px;display:flex;align-items:flex-end;padding:90px 0 80px;overflow:hidden;background:var(--dark);color:#fff}
-.company-vision>img{position:absolute;inset:0}
+/* culture.png has a pale strip on its left edge; push it just past the band. */
+.company-vision>img{position:absolute;inset:0 0 0 -8px;width:calc(100% + 8px)}
 .company-vision:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#163c23d9,#163c2333 75%,transparent)}
 .company-vision .wrap{position:relative;z-index:1}
 .company-vision-statement{margin:0 0 22px;font-size:clamp(30px,3.6vw,54px);font-weight:400;line-height:1.3;letter-spacing:1px;color:#fff}
