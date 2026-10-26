@@ -32,3 +32,6 @@ All 28 WebP images are product-only crops from the user-supplied `medi 医疗(1)
 - `enema-bag-set.webp`: PDF page 8, inspection crop (915, 601, 1245, 1058).
 
 The original PDF has pale, compressed product photography. High-resolution source photographs are recommended for feeding sets, transparent urine and dialysis bags, and small connector/port details. Rendering at 200 dpi does not restore missing source detail.
+
+## Valve detail crops — 2026-10-23
+valve-t.png, valve-screw.png, valve-push-pull.png and valve-without.png were cropped losslessly from the original embedded 2516 x 1718 image on PDF page 4 (printed page 06), supplied by the user: medi 医疗(1).pdf. Upright native-resolution crops, about 130 x 128 px each; original printed captions excluded and rendered once as HTML labels. No generative reconstruction or upscaling.

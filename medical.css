@@ -165,19 +165,19 @@ html[lang=en] .catalogue-nav em{display:none}
 /* Product rows: odd items text left / image right, even items mirrored.
    The image column takes its height from the copy so the two stay aligned. */
 .catalogue-chapter{counter-reset:product}
-.catalogue-row,.catalogue-row.reverse{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:7%;align-items:stretch}
+.catalogue-row,.catalogue-row.reverse{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:7%;align-items:center}
 .catalogue-row.reverse{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
 .catalogue-row .catalogue-copy{order:1;align-self:center}
 .catalogue-row .catalogue-art{order:2}
 .catalogue-row.reverse .catalogue-art{order:1}
 .catalogue-row.reverse .catalogue-copy{order:2}
-.catalogue-row .catalogue-art{position:relative;min-height:340px}
-.catalogue-row .catalogue-art>.product-figure,.catalogue-row .catalogue-art>.paired-products{position:absolute;inset:0}
+.catalogue-row .catalogue-art{position:relative;min-height:0;min-width:0}
+.catalogue-row .catalogue-art>.product-figure,.catalogue-row .catalogue-art>.paired-products{position:relative;margin:0}
 .catalogue-row .paired-products{grid-template-rows:minmax(0,1fr)}
 .catalogue-row .paired-products>.product-figure{height:100%;min-height:0}
 .catalogue-row .product-figure{display:flex;flex-direction:column}
 .catalogue-row .product-stage{flex:1;min-height:0;padding:44px 24px 24px}
-.catalogue-row .product-stage img{height:100%;max-height:100%}
+.catalogue-row .product-stage img{height:clamp(300px,32vw,460px);max-height:none;object-fit:contain}
 .catalogue-row .paired-products .product-stage{padding:44px 10px 18px}
 .catalogue-copy h3:before{counter-increment:product;content:counter(product,decimal-leading-zero);display:block;margin-bottom:10px;font-size:13px;letter-spacing:1.5px;color:var(--gold);font-variant-numeric:tabular-nums}
 /* Captions sit as a small tag in the top-right corner of each image. */
@@ -192,3 +192,28 @@ html[lang=en] .catalogue-nav em{display:none}
   .catalogue-row .paired-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .catalogue-row .product-stage img,.catalogue-row .paired-products .product-stage img{height:280px}
 }
+
+/* Scoped detail groups: economic bag valves and urine-meter functions. */
+.economic-product{margin-bottom:85px}
+.catalogue-row.economic-row{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:start;margin-bottom:28px}
+.economic-row .catalogue-copy{order:1;align-self:start}
+.economic-row .catalogue-art{order:2;align-self:start}
+.economic-row .product-stage{padding:38px 24px 24px}
+.economic-row .product-stage img{height:clamp(340px,32vw,420px);object-fit:contain}
+.medical-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.medical-detail-grid .product-figure{position:relative;min-width:0;margin:0;background:#fff}
+.medical-detail-grid .product-stage{min-height:0;height:auto;aspect-ratio:1.45;padding:36px 14px 14px;border:1px solid var(--line)}
+.medical-detail-grid .product-stage img{width:100%;height:100%;min-height:0;object-fit:contain;aspect-ratio:auto}
+.valve-details .product-stage img{max-width:130px;max-height:129px}
+.catalogue-chapter .medical-detail-grid .product-figure>figcaption{top:8px;right:8px;max-width:calc(100% - 16px);font-size:11px;line-height:1.4;letter-spacing:0;padding:3px 6px;text-align:right;color:var(--dark);background:#fffffff2;border:0}
+.meter-focus .catalogue-row{margin-bottom:28px}
+@media(max-width:800px){
+ .catalogue-row.economic-row{grid-template-columns:1fr;gap:24px}
+ .economic-row .catalogue-copy{order:1}.economic-row .catalogue-art{order:2}
+ .economic-row .product-stage img{height:340px}
+ .medical-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .medical-detail-grid .product-stage{aspect-ratio:1;min-height:145px;padding:42px 10px 12px}
+ .economic-product{margin-bottom:60px}
+}
+
+#economic-urine-bag,#economic-valve-details,#meter-function-details{scroll-margin-top:84px}
