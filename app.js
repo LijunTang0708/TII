@@ -2,8 +2,7 @@ let lang='zh',currentSlide=0,paused=window.matchMedia('(prefers-reduced-motion: 
 const $$=(selector)=>[...document.querySelectorAll(selector)];
 const hero=document.querySelector('.hero');
 const heroSlides=hero?[...hero.querySelectorAll('.slide')]:[];
-const heroMouse=window.matchMedia('(hover: hover) and (pointer: fine)');
-let heroHovered=false,heroKeyboardFocus=false,heroSwipe=null;
+let heroKeyboardFocus=false,heroSwipe=null;
 function setLanguage(value){lang=value;document.documentElement.lang=value==='zh'?'zh-CN':'en';$$('[data-zh]').forEach(el=>el.textContent=el.dataset[value]);$$('[data-alt-zh]').forEach(el=>el.alt=el.dataset[value==='zh'?'altZh':'altEn']);$$('[data-lang]').forEach(el=>{el.classList.toggle('active',el.dataset.lang===value);el.setAttribute('aria-pressed',String(el.dataset.lang===value))});document.title=document.body.dataset[value==='zh'?'titleZh':'titleEn']||(value==='zh'?'tii | 以创新连接产业，以品质改善生活':'tii | Connecting Innovation, Enriching Life');const description=document.querySelector('meta[name="description"]');description.content=document.body.dataset[value==='zh'?'descriptionZh':'descriptionEn']||description.content;document.querySelector('nav').setAttribute('aria-label',value==='zh'?'主导航':'Main navigation');document.querySelector('.hero')?.setAttribute('aria-label',value==='zh'?'四大业务':'Our four business divisions');document.querySelector('#previous')?.setAttribute('aria-label',value==='zh'?'上一张':'Previous slide');document.querySelector('#next')?.setAttribute('aria-label',value==='zh'?'下一张':'Next slide');updatePause();updateMenu();try{localStorage.setItem('tii-language',value)}catch{} }
 function updatePause(){const p=document.querySelector('#pause');if(!p)return;p.textContent=paused?'▷':'Ⅱ';p.setAttribute('aria-label',lang==='zh'?(paused?'开始自动轮播':'暂停自动轮播'):(paused?'Start slideshow':'Pause slideshow'));p.setAttribute('aria-pressed',String(paused))}
 function showSlide(index){
@@ -22,7 +21,7 @@ function showSlide(index){
 }
 function startTimer(){
   clearInterval(timer);
-  if(heroSlides.length>1&&!paused&&!document.hidden&&!heroHovered&&!heroKeyboardFocus&&!heroSwipe){
+  if(heroSlides.length>1&&!paused&&!document.hidden&&!heroKeyboardFocus&&!heroSwipe){
     timer=setInterval(()=>showSlide(currentSlide+1),6500);
   }
 }
@@ -32,12 +31,7 @@ $$('[data-go]').forEach(el=>el.addEventListener('click',()=>manualSlide(Number(e
 document.querySelector('#next')?.addEventListener('click',()=>manualSlide(currentSlide+1));
 document.querySelector('#previous')?.addEventListener('click',()=>manualSlide(currentSlide-1));
 document.querySelector('#pause')?.addEventListener('click',()=>{paused=!paused;updatePause();startTimer()});
-hero?.addEventListener('pointerenter',event=>{
-  if(event.pointerType==='mouse'&&heroMouse.matches){heroHovered=true;startTimer()}
-});
-hero?.addEventListener('pointerleave',event=>{
-  if(event.pointerType==='mouse'){heroHovered=false;startTimer()}
-});
+// Pointer hover reveals the edge arrows without interrupting autoplay.
 hero?.addEventListener('focusin',event=>{
   heroKeyboardFocus=event.target.matches(':focus-visible');
   startTimer();
@@ -55,8 +49,7 @@ hero?.addEventListener('keydown',event=>{
 // Lock the gesture to its first clear direction so scrolling cannot become a swipe.
 hero?.addEventListener('pointerdown',event=>{
   heroKeyboardFocus=false;
-  if(event.pointerType==='mouse')return;
-  heroHovered=false;
+  if(event.pointerType==='mouse'){startTimer();return}
   if(!event.isPrimary){heroSwipe=null;startTimer();return}
   heroSwipe={id:event.pointerId,x:event.clientX,y:event.clientY,axis:null};
   hero.setPointerCapture(event.pointerId);
