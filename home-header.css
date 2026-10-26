@@ -1,0 +1,56 @@
+/* Only the homepage overlays its navigation on the first viewport. */
+.home-overlay{--home-header-height:100px}
+.home-overlay .site-header{
+  --header-ink:var(--ink);--header-muted:#788378;--header-divider:var(--gold);
+  position:fixed;inset:0 0 auto;height:var(--home-header-height);
+  background:#fff;color:var(--header-ink);border-bottom:1px solid #edf0e9;
+}
+.home-overlay .site-header:not(.is-scrolled):not(:has([aria-expanded="true"])){
+  --header-ink:#fff;--header-muted:#ffffffc9;--header-divider:#ffffff70;
+  background:transparent;border-bottom-color:transparent;
+}
+.home-overlay .site-header.header-ready{transition:background-color .22s,color .22s,border-color .22s}
+.home-overlay .site-header .brand{color:var(--header-ink)}
+.home-overlay .site-header .brand-name{border-left-color:var(--header-divider)}
+.home-overlay #navigation .dropdown-main>li>a,
+.home-overlay #navigation .dropdown-main>li>.dropdown-toggle{color:var(--header-ink);font-weight:400}
+.home-overlay .site-header .language button{color:var(--header-muted)}
+.home-overlay .site-header .language button.active{color:var(--header-ink)}
+.home-overlay .site-header .language span{color:var(--header-divider)}
+.home-overlay .site-header .menu-toggle span{background:var(--header-ink)}
+.home-overlay .site-header.header-ready .brand,
+.home-overlay .site-header.header-ready .language button,
+.home-overlay .site-header.header-ready #navigation .dropdown-main>li>a,
+.home-overlay .site-header.header-ready #navigation .dropdown-main>li>.dropdown-toggle{transition:color .22s}
+
+.home-overlay .hero{height:100svh;min-height:0;max-height:none}
+.home-overlay .hero .hero-content{padding-top:calc(var(--home-header-height) + clamp(40px,8svh,100px));padding-bottom:32px}
+.home-overlay .hero::before{
+  content:"";position:absolute;inset:0 0 auto;height:clamp(160px,30svh,300px);
+  background:linear-gradient(180deg,rgba(9,24,20,.72),rgba(9,24,20,.35) 45%,transparent);
+  z-index:2;pointer-events:none;
+}
+.home-overlay .hero .slide::after{
+  background:linear-gradient(90deg,rgba(10,33,18,.70),rgba(10,33,18,.54) 42%,rgba(10,33,18,.08) 82%),linear-gradient(0deg,rgba(8,29,15,.28),transparent 50%);
+}
+.home-overlay .hero .slide img{object-fit:cover}
+.home-overlay .hero .slide[data-slide="0"] img{object-position:65% 50%}
+.home-overlay .hero .slide[data-slide="1"] img{object-position:58% 50%}
+.home-overlay .hero .slide[data-slide="2"] img{object-position:52% 60%}
+.home-overlay .hero .slide[data-slide="3"] img{object-position:50% 55%}
+.home-overlay .hero .hero-edge-control{top:var(--home-header-height)}
+.home-overlay .hero .hero-edge-icon{transform:translateY(calc(var(--home-header-height) / -2))}
+
+@media(max-width:800px){
+  .home-overlay{--home-header-height:76px}
+  .home-overlay .hero .slide[data-slide="0"] img{object-position:72% 50%}
+  .home-overlay .hero .slide[data-slide="1"] img{object-position:62% 50%}
+  .home-overlay .hero .slide[data-slide="2"] img{object-position:58% 60%}
+  .home-overlay .hero .slide[data-slide="3"] img{object-position:55% 55%}
+}
+@media(max-height:600px){
+  .home-overlay .hero .hero-content{padding-top:calc(var(--home-header-height) + 24px);padding-bottom:16px}
+  .home-overlay .hero .eyebrow{margin-bottom:12px}
+  html .home-overlay .hero h1,html .home-overlay .hero h2{font-size:clamp(28px,4vw,40px);line-height:1.2;margin-bottom:16px}
+  .home-overlay .hero .hero-desc{font-size:15px;line-height:1.5}
+}

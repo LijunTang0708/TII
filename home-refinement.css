@@ -1,0 +1,4 @@
+/* Sunrise artwork supplied by the user; keep the figure on the right of the desktop composition. */
+.slide[data-slide="0"] img{object-position:65% center}
+.slide[data-slide="0"]:after{background:linear-gradient(90deg,rgba(16,34,28,.72),rgba(16,34,28,.28) 58%,rgba(16,34,28,.08)),linear-gradient(0deg,rgba(16,34,28,.66),transparent 55%)}
+@media(max-width:800px){.slide[data-slide="0"] img{object-position:70% center}.slide[data-slide="0"]:after{background:linear-gradient(90deg,rgba(16,34,28,.65),rgba(16,34,28,.25)),linear-gradient(0deg,rgba(16,34,28,.7),transparent 60%)}}

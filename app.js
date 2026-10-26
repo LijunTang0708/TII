@@ -1,14 +1,89 @@
 let lang='zh',currentSlide=0,paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches,timer;
 const $$=(selector)=>[...document.querySelectorAll(selector)];
+const hero=document.querySelector('.hero');
+const heroSlides=hero?[...hero.querySelectorAll('.slide')]:[];
+const heroMouse=window.matchMedia('(hover: hover) and (pointer: fine)');
+let heroHovered=false,heroKeyboardFocus=false,heroSwipe=null;
 function setLanguage(value){lang=value;document.documentElement.lang=value==='zh'?'zh-CN':'en';$$('[data-zh]').forEach(el=>el.textContent=el.dataset[value]);$$('[data-alt-zh]').forEach(el=>el.alt=el.dataset[value==='zh'?'altZh':'altEn']);$$('[data-lang]').forEach(el=>{el.classList.toggle('active',el.dataset.lang===value);el.setAttribute('aria-pressed',String(el.dataset.lang===value))});document.title=document.body.dataset[value==='zh'?'titleZh':'titleEn']||(value==='zh'?'tii | 以创新连接产业，以品质改善生活':'tii | Connecting Innovation, Enriching Life');const description=document.querySelector('meta[name="description"]');description.content=document.body.dataset[value==='zh'?'descriptionZh':'descriptionEn']||description.content;document.querySelector('nav').setAttribute('aria-label',value==='zh'?'主导航':'Main navigation');document.querySelector('.hero')?.setAttribute('aria-label',value==='zh'?'四大业务':'Our four business divisions');document.querySelector('#previous')?.setAttribute('aria-label',value==='zh'?'上一张':'Previous slide');document.querySelector('#next')?.setAttribute('aria-label',value==='zh'?'下一张':'Next slide');updatePause();updateMenu();try{localStorage.setItem('tii-language',value)}catch{} }
 function updatePause(){const p=document.querySelector('#pause');if(!p)return;p.textContent=paused?'▷':'Ⅱ';p.setAttribute('aria-label',lang==='zh'?(paused?'开始自动轮播':'暂停自动轮播'):(paused?'Start slideshow':'Pause slideshow'));p.setAttribute('aria-pressed',String(paused))}
-function showSlide(index){currentSlide=(index+4)%4;$$('.slide').forEach((slide,i)=>{slide.classList.toggle('active',i===currentSlide);slide.setAttribute('aria-hidden',String(i!==currentSlide));slide.inert=i!==currentSlide});$$('[data-go]').forEach((el,i)=>{el.classList.toggle('active',i===currentSlide);el.setAttribute('aria-pressed',String(i===currentSlide))})}
-function startTimer(){clearInterval(timer);if(document.querySelector('.hero')&&!paused&&!document.hidden)timer=setInterval(()=>showSlide(currentSlide+1),6500)}
+function showSlide(index){
+  if(!heroSlides.length)return;
+  currentSlide=(index+heroSlides.length)%heroSlides.length;
+  heroSlides.forEach((slide,i)=>{
+    slide.classList.toggle('active',i===currentSlide);
+    slide.setAttribute('aria-hidden',String(i!==currentSlide));
+    slide.inert=i!==currentSlide;
+  });
+  // Retain support for existing navigation preview pages.
+  $$('[data-go]').forEach((el,i)=>{
+    el.classList.toggle('active',i===currentSlide);
+    el.setAttribute('aria-pressed',String(i===currentSlide));
+  });
+}
+function startTimer(){
+  clearInterval(timer);
+  if(heroSlides.length>1&&!paused&&!document.hidden&&!heroHovered&&!heroKeyboardFocus&&!heroSwipe){
+    timer=setInterval(()=>showSlide(currentSlide+1),6500);
+  }
+}
 function manualSlide(index){showSlide(index);startTimer()}
 $$('[data-lang]').forEach(el=>el.addEventListener('click',()=>setLanguage(el.dataset.lang)));
 $$('[data-go]').forEach(el=>el.addEventListener('click',()=>manualSlide(Number(el.dataset.go))));
-document.querySelector('#next')?.addEventListener('click',()=>manualSlide(currentSlide+1));document.querySelector('#previous')?.addEventListener('click',()=>manualSlide(currentSlide-1));document.querySelector('#pause')?.addEventListener('click',()=>{paused=!paused;updatePause();startTimer()});
-const hero=document.querySelector('.hero');hero?.addEventListener('mouseenter',()=>clearInterval(timer));hero?.addEventListener('mouseleave',startTimer);hero?.addEventListener('focusin',()=>clearInterval(timer));hero?.addEventListener('focusout',(e)=>{if(!hero.contains(e.relatedTarget))startTimer()});hero?.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();manualSlide(currentSlide+(e.key==='ArrowRight'?1:-1))}});let touchX=0;hero?.addEventListener('touchstart',e=>{touchX=e.changedTouches[0].clientX},{passive:true});hero?.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>60)manualSlide(currentSlide+(delta<0?1:-1))},{passive:true});document.addEventListener('visibilitychange',startTimer);
+document.querySelector('#next')?.addEventListener('click',()=>manualSlide(currentSlide+1));
+document.querySelector('#previous')?.addEventListener('click',()=>manualSlide(currentSlide-1));
+document.querySelector('#pause')?.addEventListener('click',()=>{paused=!paused;updatePause();startTimer()});
+hero?.addEventListener('pointerenter',event=>{
+  if(event.pointerType==='mouse'&&heroMouse.matches){heroHovered=true;startTimer()}
+});
+hero?.addEventListener('pointerleave',event=>{
+  if(event.pointerType==='mouse'){heroHovered=false;startTimer()}
+});
+hero?.addEventListener('focusin',event=>{
+  heroKeyboardFocus=event.target.matches(':focus-visible');
+  startTimer();
+});
+hero?.addEventListener('focusout',event=>{
+  if(!hero.contains(event.relatedTarget)){heroKeyboardFocus=false;startTimer()}
+});
+hero?.addEventListener('keydown',event=>{
+  heroKeyboardFocus=true;
+  if(event.key==='ArrowRight'||event.key==='ArrowLeft'){
+    event.preventDefault();manualSlide(currentSlide+(event.key==='ArrowRight'?1:-1));
+  }else startTimer();
+});
+// Native vertical scrolling and pinch zoom remain available through touch-action.
+// Lock the gesture to its first clear direction so scrolling cannot become a swipe.
+hero?.addEventListener('pointerdown',event=>{
+  heroKeyboardFocus=false;
+  if(event.pointerType==='mouse')return;
+  heroHovered=false;
+  if(!event.isPrimary){heroSwipe=null;startTimer();return}
+  heroSwipe={id:event.pointerId,x:event.clientX,y:event.clientY,axis:null};
+  hero.setPointerCapture(event.pointerId);
+  startTimer();
+});
+function swipeDirection(event){
+  if(!heroSwipe||event.pointerId!==heroSwipe.id)return;
+  const dx=event.clientX-heroSwipe.x,dy=event.clientY-heroSwipe.y;
+  if(!heroSwipe.axis&&Math.max(Math.abs(dx),Math.abs(dy))>=12){
+    heroSwipe.axis=Math.abs(dx)>Math.abs(dy)*1.25?'x':'y';
+  }
+}
+hero?.addEventListener('pointermove',swipeDirection,{passive:true});
+hero?.addEventListener('pointerup',event=>{
+  if(!heroSwipe||event.pointerId!==heroSwipe.id)return;
+  swipeDirection(event);
+  const gesture=heroSwipe,dx=event.clientX-gesture.x;
+  heroSwipe=null;
+  const threshold=Math.max(48,Math.min(72,hero.clientWidth*.08));
+  if(gesture.axis==='x'&&Math.abs(dx)>=threshold){
+    manualSlide(currentSlide+(dx<0?1:-1));
+  }else startTimer();
+});
+hero?.addEventListener('pointercancel',event=>{
+  if(heroSwipe?.id===event.pointerId){heroSwipe=null;startTimer()}
+});
+document.addEventListener('visibilitychange',startTimer);
 // Shared navigation disclosures: native buttons retain Enter/Space behavior.
 const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('#navigation');
 const navDesktop=window.matchMedia('(min-width: 801px)');
